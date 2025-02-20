@@ -26,12 +26,13 @@ virt-customize -a 22.04-jammy-server-cloudimg-amd64.img \
 ```
 
 # Build image
-docker build -t kubevirt-images:ubuntu22.04 .
+docker build -t kubevirt-images:ubuntu22.04-monitoring .
 
 # Push image to docker.io
 docker login  
-docker tag kubevirt-images:ubuntu22.04 username_docker/kubevirt-images:ubuntu22.04  
-docker push username_docker/kubevirt-images:ubuntu22.04
+docker tag kubevirt-images:ubuntu22.04-monitoring username_docker/kubevirt-images:ubuntu22.04-monitoring  
+docker push username_docker/kubevirt-images:ubuntu22.04-monitoring
 
 # Test image - change image in vm.yaml 
 kubectl apply -f vm.yaml
+kubectl apply -f svc.yaml

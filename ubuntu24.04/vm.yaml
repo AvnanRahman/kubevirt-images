@@ -1,0 +1,67 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vm-afnan-image
+  namespace: default
+  labels:
+    vm.kubevirt.io/name: vm-afnan-image
+spec:
+  running: true
+  template:
+    spec:
+      domain:
+        resources:
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+              #requests:
+              #memory: "64Gi"
+              #cpu: "8"
+        devices:
+#          gpus:
+#          - deviceName: nvidia.com/NVIDIA_L40S-24Q
+#            name: gpu1
+          disks:
+          - name: containerdisk
+            disk:
+              bus: virtio
+          - disk:
+              bus: virtio
+            name: cloudinitdisk      
+          interfaces:
+          - masquerade: {}
+            name: defaultnetwork
+      networks:
+      - name: defaultnetwork
+        pod: {}     
+      volumes:
+      - name: containerdisk
+        dataVolume:
+          name: dv-vm-afnan-image
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |-
+            #cloud-config
+            #password: fedora
+            #chpasswd: { expire: False }
+            #cloud-config
+            chpasswd:
+              list: |
+                ubuntu:Admin123
+                root:Admin123
+              expire: False
+  dataVolumeTemplates:
+  - metadata:
+      name: dv-vm-afnan-image
+      namespace: default
+    spec:
+      storage:
+        storageClassName: storage-nvme-c2
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: 20Gi
+      source:
+        registry:
+          url: docker://docker.io/hiroominan/kubevirt-images:ubuntu24.04
